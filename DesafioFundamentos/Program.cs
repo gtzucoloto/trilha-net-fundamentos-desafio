@@ -1,59 +1,40 @@
-﻿using DesafioFundamentos.Models;
+﻿using System.Text;
+using DesafioFundamentos.Infrastructure;
+using DesafioFundamentos.Models;
 
-// Coloca o encoding para UTF8 para exibir acentuação
-Console.OutputEncoding = System.Text.Encoding.UTF8;
+Console.OutputEncoding = Encoding.UTF8;
 
-decimal precoInicial = 0;
-decimal precoPorHora = 0;
+Prompt.Escrever("Seja bem vindo ao sistema de estacionamento!");
+var precoInicial = Prompt.PerguntarUsuario<decimal>("Digite o preço inicial:");
+Prompt.Limpar();
+var precoPorHora = Prompt.PerguntarUsuario<decimal>("Agora digite o preço por hora:");
+var es = new Estacionamento(precoInicial, precoPorHora);
 
-Console.WriteLine("Seja bem vindo ao sistema de estacionamento!\n" +
-                  "Digite o preço inicial:");
-precoInicial = Convert.ToDecimal(Console.ReadLine());
+int opcao;
+var sb = new StringBuilder();
+sb.AppendLine("1 - Cadastrar veículo");
+sb.AppendLine("2 - Remover veículo");
+sb.AppendLine("3 - Listar veículos");
+sb.AppendLine("4 - Encerrar");
+var menu = sb.ToString();
 
-Console.WriteLine("Agora digite o preço por hora:");
-precoPorHora = Convert.ToDecimal(Console.ReadLine());
-
-// Instancia a classe Estacionamento, já com os valores obtidos anteriormente
-Estacionamento es = new Estacionamento(precoInicial, precoPorHora);
-
-string opcao = string.Empty;
-bool exibirMenu = true;
-
-// Realiza o loop do menu
-while (exibirMenu)
+do
 {
-    Console.Clear();
-    Console.WriteLine("Digite a sua opção:");
-    Console.WriteLine("1 - Cadastrar veículo");
-    Console.WriteLine("2 - Remover veículo");
-    Console.WriteLine("3 - Listar veículos");
-    Console.WriteLine("4 - Encerrar");
+    Prompt.Limpar();
+    Prompt.Escrever(menu);
+    opcao = Prompt.PerguntarUsuario<int>("Digite a sua opção:");
 
-    switch (Console.ReadLine())
+    var retorno = opcao switch
     {
-        case "1":
-            es.AdicionarVeiculo();
-            break;
+        1 => es.AdicionarVeiculo(),
+        2 => es.RemoverVeiculo(),
+        3 => es.ListarVeiculos(),
+        4 => "O programa será encerrado!",
+        _ => "Opção inválida"
+    };
+    
+    Prompt.Escrever(retorno);
+    _ = Prompt.PerguntarUsuario<string>("Digite qualquer tecla para continuar:");
+} while (opcao != 4);
 
-        case "2":
-            es.RemoverVeiculo();
-            break;
-
-        case "3":
-            es.ListarVeiculos();
-            break;
-
-        case "4":
-            exibirMenu = false;
-            break;
-
-        default:
-            Console.WriteLine("Opção inválida");
-            break;
-    }
-
-    Console.WriteLine("Pressione uma tecla para continuar");
-    Console.ReadLine();
-}
-
-Console.WriteLine("O programa se encerrou");
+Prompt.Escrever("Programa finalizado!");
